@@ -1,0 +1,26 @@
+#menu {
+    height: 88px;
+}
+
+.container-supplier-page {
+    height:  calc(100% - 241px);
+    padding: 0 24px;
+}
+.group-control {
+    display: flex;
+    align-items: flex-end;
+    
+}
+.icon-edit,
+.icon-delete {
+    cursor: pointer;
+    padding: 2px 4px;
+}
+
+.icon-edit {
+    color: rgb(108, 150, 45);
+}
+
+.icon-delete {
+    color: rgb(191, 64, 64);
+}

@@ -1,0 +1,57 @@
+#menu {
+    height: 88px;
+}
+
+.container-product-page {
+    height:  calc(100% - 241px);
+    padding: 0 24px;
+    
+}
+.col-description {
+    min-width: 270px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 1;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+}
+
+.col-product-name {
+    width: 270px;
+}
+
+
+.group-control {
+    display: flex;
+    align-items: flex-end;
+    
+}
+
+.col-price {
+    width: 110px;
+}
+
+.col-suplier {
+    width: 140px;
+}
+
+.col-stock {
+    width: 140px;
+}
+
+.col-unit {
+    width: 100px;
+}
+
+.col-action {
+    width: 86px;
+}
+
+.col-action-header {
+    width: 96px;
+}
+
+.container-data-table {
+    height: calc(100% - 65px);
+    overflow: auto;
+}

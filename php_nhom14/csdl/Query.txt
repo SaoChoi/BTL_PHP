@@ -1,0 +1,146 @@
+CREATE DATABASE qlkho
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_0900_ai_ci;
+
+CREATE TABLE qlkho.unit (
+  Id int NOT NULL AUTO_INCREMENT,
+  UnitName varchar(255) CHARACTER SET utf8mb3 COLLATE utf8_general_ci NOT NULL DEFAULT '',
+  PRIMARY KEY (Id)
+)
+ENGINE = INNODB,
+CHARACTER SET utf8mb4,
+COLLATE utf8mb4_0900_ai_ci,
+COMMENT = 'Đơn vị tính';
+
+CREATE TABLE qlkho.employeerole (
+  Id int NOT NULL AUTO_INCREMENT,
+  RoleName varchar(255) CHARACTER SET utf8mb3 COLLATE utf8_general_ci DEFAULT NULL COMMENT 'Tên vai trò',
+  PRIMARY KEY (Id)
+)
+ENGINE = INNODB,
+CHARACTER SET utf8mb4,
+COLLATE utf8mb4_0900_ai_ci,
+COMMENT = 'Bảng phân quyền user';
+
+CREATE TABLE qlkho.employee (
+  Id int NOT NULL AUTO_INCREMENT,
+  RoleId int DEFAULT NULL COMMENT 'Id phân quyền của user (0 - Nhân viên kho, 1 - Kế toán, 2 - Quản lý kho )',
+  IsWorking bit(1) NOT NULL DEFAULT b'1' COMMENT 'Trạng thái đang làm việc',
+  Password varchar(255) CHARACTER SET utf8mb3 COLLATE utf8_general_ci DEFAULT NULL COMMENT 'Mật khẩu',
+  FullName varchar(255) CHARACTER SET utf8mb3 COLLATE utf8_general_ci DEFAULT NULL COMMENT 'Tên đầy đủ',
+  UserName varchar(255) CHARACTER SET utf8mb3 COLLATE utf8_general_ci DEFAULT NULL COMMENT 'Tên đăng nhập',
+  Email varchar(50) DEFAULT NULL COMMENT 'Địa chỉ email',
+  Phone int DEFAULT NULL COMMENT 'Số điện thoại',
+  Gender int DEFAULT NULL COMMENT 'Giới tính',
+  Birthday date DEFAULT NULL COMMENT 'Ngày sinh',
+  Salary double DEFAULT 0 COMMENT 'Lương nhân viên',
+  PRIMARY KEY (Id)
+)
+ENGINE = INNODB,
+CHARACTER SET utf8mb4,
+COLLATE utf8mb4_0900_ai_ci;
+
+ALTER TABLE qlkho.employee
+ADD CONSTRAINT FK_users_RoleId FOREIGN KEY (RoleId)
+REFERENCES qlkho.employeerole (Id);
+
+CREATE TABLE qlkho.suplier (
+  Id int NOT NULL AUTO_INCREMENT,
+  SuplierName varchar(255) CHARACTER SET utf8mb3 COLLATE utf8_general_ci DEFAULT NULL COMMENT 'Tên nhà cung cấp',
+  Address varchar(255) CHARACTER SET utf8mb3 COLLATE utf8_general_ci DEFAULT NULL COMMENT 'Địa chỉ nhà cung cấp',
+  PhoneNumber char(20) DEFAULT NULL COMMENT 'Số điện thoại',
+  Email char(255) DEFAULT NULL,
+  PRIMARY KEY (Id)
+)
+ENGINE = INNODB,
+CHARACTER SET utf8mb4,
+COLLATE utf8mb4_0900_ai_ci,
+COMMENT = 'Nhà cung cấp';
+
+CREATE TABLE qlkho.stock (
+  Id int NOT NULL AUTO_INCREMENT COMMENT 'Mã kho',
+  StockName varchar(255) CHARACTER SET utf8mb3 COLLATE utf8_general_ci DEFAULT NULL COMMENT 'Tên kho',
+  Address varchar(255) CHARACTER SET utf8mb3 COLLATE utf8_general_ci DEFAULT NULL COMMENT 'Địa chỉ kho',
+  PRIMARY KEY (Id)
+)
+ENGINE = INNODB,
+CHARACTER SET utf8mb4,
+COLLATE utf8mb4_0900_ai_ci,
+COMMENT = 'Kho hàng';
+
+CREATE TABLE qlkho.receipt (
+  Id int NOT NULL AUTO_INCREMENT,
+  StockId int DEFAULT NULL COMMENT 'Mã kho',
+  EmployeeId int DEFAULT NULL,
+  StockName varchar(255) DEFAULT NULL COMMENT 'Tên kho',
+  ReceiptType int DEFAULT NULL COMMENT 'Loại phiếu (0 - phiếu nhập , 1 - phiếu xuất )',
+  Title varchar(255) CHARACTER SET utf8mb3 COLLATE utf8_general_ci DEFAULT NULL COMMENT 'Tiêu đề đề xuất',
+  Content varchar(255) CHARACTER SET utf8mb3 COLLATE utf8_general_ci DEFAULT NULL COMMENT 'Nội dung đề xuất',
+  IsAppect bit(1) NOT NULL DEFAULT b'0' COMMENT 'Trạng thái phê duyệt',
+  CreateDate date DEFAULT NULL COMMENT 'Ngày lập lập phiếu',
+  PRIMARY KEY (Id)
+)
+ENGINE = INNODB,
+CHARACTER SET utf8mb4,
+COLLATE utf8mb4_0900_ai_ci,
+COMMENT = 'phiếu nhập , xuất kho ';
+
+ALTER TABLE qlkho.receipt
+ADD CONSTRAINT FK_proposal_UserId FOREIGN KEY (EmployeeId)
+REFERENCES qlkho.employee (Id);
+
+ALTER TABLE qlkho.receipt
+ADD CONSTRAINT FK_receipt_StockId FOREIGN KEY (StockId)
+REFERENCES qlkho.stock (Id);
+
+CREATE TABLE qlkho.product (
+  Id int NOT NULL AUTO_INCREMENT,
+  StockId int NOT NULL,
+  SuplierId int DEFAULT NULL COMMENT 'Id nhà cung cấp',
+  UnitId int NOT NULL COMMENT 'Id đơn vị',
+  Description varchar(255) CHARACTER SET utf8mb3 COLLATE utf8_general_ci DEFAULT NULL COMMENT 'Mô tả sản phẩm',
+  ProductName varchar(255) CHARACTER SET utf8mb3 COLLATE utf8_general_ci DEFAULT NULL,
+  Quantity int DEFAULT NULL COMMENT 'Số lượng khai báo ban đầu',
+  UnitDisplay varchar(255) CHARACTER SET utf8mb3 COLLATE utf8_general_ci DEFAULT NULL COMMENT 'Đơn vị',
+  UnitPrice double DEFAULT NULL COMMENT 'Đơn giá sản phẩm',
+  PRIMARY KEY (Id, StockId),
+  UNIQUE INDEX UK_product_Id (Id)
+)
+ENGINE = INNODB,
+CHARACTER SET utf8mb4,
+COLLATE utf8mb4_0900_ai_ci;
+
+ALTER TABLE qlkho.product
+ADD CONSTRAINT FK_product_StockId FOREIGN KEY (StockId)
+REFERENCES qlkho.stock (Id);
+
+ALTER TABLE qlkho.product
+ADD CONSTRAINT FK_product_SuplierId FOREIGN KEY (SuplierId)
+REFERENCES qlkho.suplier (Id);
+
+ALTER TABLE qlkho.product
+ADD CONSTRAINT FK_product_UnitId FOREIGN KEY (UnitId)
+REFERENCES qlkho.unit (Id);
+
+CREATE TABLE qlkho.product_receipt (
+  ProductId int NOT NULL,
+  ReceiptId int NOT NULL,
+  Price double DEFAULT NULL COMMENT 'Đơn giá',
+  ProposalNumber int DEFAULT NULL COMMENT 'Số lượng đề xuất',
+  ActualNumber int DEFAULT NULL COMMENT 'Số lượng thực tế',
+  ProductName varchar(255) CHARACTER SET utf8mb3 COLLATE utf8_general_ci DEFAULT NULL COMMENT 'Tên sản phẩm',
+  UnitName varchar(255) DEFAULT NULL COMMENT 'Đơn vị tính',
+  PRIMARY KEY (ProductId, ReceiptId)
+)
+ENGINE = INNODB,
+CHARACTER SET utf8mb4,
+COLLATE utf8mb4_0900_ai_ci,
+COMMENT = 'Bảng sản phẩm được đề xuất mua';
+
+ALTER TABLE qlkho.product_receipt
+ADD CONSTRAINT FK_product_receipt_ProductId FOREIGN KEY (ProductId)
+REFERENCES qlkho.product (Id);
+
+ALTER TABLE qlkho.product_receipt
+ADD CONSTRAINT FK_product_receipt_ReceiptId FOREIGN KEY (ReceiptId)
+REFERENCES qlkho.receipt (Id);
